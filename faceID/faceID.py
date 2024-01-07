@@ -6,7 +6,7 @@ import numpy as np
 import math
 import time
 
-#This function determines how confident a face is accurate.
+
 def face_confidence(face_distance, face_match_threshold=0.6):
 	range = 1.0 - face_match_threshold
 	linear_val = (1.0 - face_distance) / (range * 2.0)
@@ -17,19 +17,21 @@ def face_confidence(face_distance, face_match_threshold=0.6):
 		value = (linear_val + ((1.0 - linear_val) * math.pow((linear_val - 0.5) * 2, 0.2))) * 100
 		return str(round(value, 2)) + '%'
 		
-#This class does face recognition
+#This is the face recognition class
 class FaceRecognition:
 	face_positions = []
 	face_encodings = []
 	known_face_encodings = []
 	face_names = []
 	known_face_names = []
+	confidences = []
 	process_current_frame = True
 	
+	#This is the constructor
 	def __init__(self):
 		self.encode_faces()
 		
-	#This method encodes verified faces
+	#This method encodes recognized faces
 	def encode_faces(self):
 		for image in os.listdir("faces"):
 			imageName = f"{image}"
@@ -40,31 +42,39 @@ class FaceRecognition:
 			self.known_face_encodings.append(face_encoding)
 			self.known_face_names.append(image)
 			
-	#This method operates the camera		
+		print(self.known_face_names)
+		
+						
+						
+		
 	def run_recognition(self):
 		video_capture = cv2.VideoCapture(0)
-				
+		
+		t = 0;
+		
 		if not video_capture.isOpened():
 			sys.exit("Cannot open the video source")
 		
+		snapShot = False
+		
+		
 		while True:
+			t += 1
 			ret, frame = video_capture.read()
 			
-			#Only every second frame is processed
 			if self.process_current_frame:
 				small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
 				
 				
 				#The frame is coverted to RGB
-				rgb_small_frame = np.ascontiguousarray(small_frame[:, :, ::-1])				
+				rgb_small_frame = np.ascontiguousarray(small_frame[:, :, ::-1])
+				
 				
 							
 				#The next step is to find all the faces in the current frame.
 				self.face_positions = fr.face_locations(rgb_small_frame)
 				self.face_encodings = fr.face_encodings(rgb_small_frame, self.face_positions)
-				
-				print("Encoding complete")
-				
+								
 				self.face_names = []
 				for face_encoding in self.face_encodings:
 					matches = fr.compare_faces(self.known_face_encodings, face_encoding)
@@ -78,8 +88,20 @@ class FaceRecognition:
 					if matches[best_match_index]:
 						name = self.known_face_names[best_match_index]
 						confidence = face_confidence(face_distances[best_match_index])
-					
+						
+					#All matches and corresponding confidences are stored.
 					self.face_names.append(f"{name} ({confidence})")
+					
+					if (not confidence == "unknown"):
+						#Another variable interprets the confidence as a float.
+						confidenceAsFloat = confidence.replace("%", "")
+						confidenceAsFloat = float(confidenceAsFloat)
+						self.confidences.append(confidenceAsFloat)
+						color = (0x00, 0xFF, 0x00)
+					else:
+						self.confidences.append(confidence)
+						color = (0x00, 0x00, 0xFF)
+					
 			self.process_current_frame = not self.process_current_frame
 			
 			
@@ -89,10 +111,22 @@ class FaceRecognition:
 				left *= 4  #y stands for left
 				right *= 4 #a stands for width or right
 				bottom *= 4 #b stands for bottom or height
+				perCent = name[len(name)-7:len(name) - 2:1]
 				
-				cv2.rectangle(frame, (left, top), (right, bottom), (0xFF, 0x00, 0x00), 2)
-				cv2.rectangle(frame, (left, bottom-35), (right, bottom), (0xFF, 0x00, 0x00), -1)
+				#Converting to a number is important
+				perCent = perCent.replace("(", "")
+				perCent = float(perCent)
+				
+				#Confidence has to be 90 per cent to be verified
+				if ((not name.startswith("unknown")) and perCent >= 90):
+					color = (0x00, 0xFF, 0x00)
+				else:
+					color = (0x00, 0x00, 0xFF)
+				
+				cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
+				cv2.rectangle(frame, (left, bottom-35), (right, bottom), color, -1)
 				cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0xFF, 0xFF, 0xFF), 2)
+				
 			
 			cv2.imshow("Face ID", frame)
 			
@@ -100,6 +134,9 @@ class FaceRecognition:
 			
 			if key == ord('q'):
 				break
+				
+			
+					
 		
 		video_capture.release()
 		cv2.destroyAllWindows()	
