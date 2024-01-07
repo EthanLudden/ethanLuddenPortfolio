@@ -1,4 +1,5 @@
-#This is a webscraper
+#This is a webscraper for recording pokemon stats in a spreadsheet.
+#Author Ethan Ludden
 
 #These are the imports that are being used.
 import csv

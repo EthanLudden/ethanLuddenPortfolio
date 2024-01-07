@@ -1,5 +1,5 @@
 #Author: Ethan Ludden
-#This is a webscraper
+#This is a webscraper Usually for airlines but can be used for any csv file.
 
 #These are the imports that are being used.
 import csv
