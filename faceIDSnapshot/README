@@ -1,0 +1,11 @@
+Title: FaceID
+Author: Ethan Ludden
+
+Summary:
+Face ID Snapshot is a user verification tool in python. The program scans a user’s face and compares it to a collection of registered faces in the “faces” directory. When the user’s face is in the frame, he or she will press the space bar to take a snapshot of his or her face. The user will see his or her snapshot on screen while the verification status is loading. The verification result is displayed for ten seconds.
+
+
+Registered faces: These faces will cause the frame to turn green
+ - Jack Black
+ - King Charles III
+ - Sonja Reid
