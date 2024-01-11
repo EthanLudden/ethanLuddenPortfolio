@@ -3,6 +3,7 @@ import os, sys
 import time
 import pygame
 import cv2
+import shutil
 #Some imports require prerequisites. Pygame is one of them
 from os import environ
 import pygame
@@ -31,6 +32,7 @@ def canvas(songs):
 	root.geometry(dimenstions)
 	
 	album = []
+	userAlbum = set()
 	
 	#The background will be black to make it harmless to some eyes.
 	root.configure(background = "#000000")
@@ -50,8 +52,18 @@ def canvas(songs):
 	def readFinder():
 		root.directory = filedialog.askdirectory()
 		for song in (os.listdir(root.directory)):
-			if song.endswith(".mp3"):
-				songs.add(song)
+			try:
+				if song.endswith(".mp3"):
+					#Two paths are set up  for user input
+					relPathSong = os.path.join(root.directory, song)
+					destPathSong = os.path.join(".", "Music", song)
+					shutil.copy(relPathSong, destPathSong)
+					userAlbum.add(song)
+					songs.add(song)
+
+			except PermissionError:
+				print("Song does not have permission to load.")
+						
 	
 				
 	#This inner function is for the add button or for inserting songs from the songlist into the album.
@@ -180,6 +192,9 @@ def canvas(songs):
 	
 	#This function closes the program
 	def exit():
+		for song in userAlbum:
+			songToRemove = os.path.join("Music", song)
+			os.remove(songToRemove)
 		sys.exit("Finished")
 	
 	#This function deals with shortcuts
