@@ -1,0 +1,10 @@
+Title: FaceID
+Author: Ethan Ludden
+
+Summary:
+Face ID is a user verification tool in python. The program scans a user’s face and compares it to a collection of registered faces in the “faces” directory. If the user’s face matches one of the registered faces to at least 90% the user is verified and the frame turns green. Otherwise, the frame turns red.
+
+Registered faces: These faces will cause the frame to turn green
+ - Jack Black
+ - King Charles III
+ - Sonja Reid
