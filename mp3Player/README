@@ -1,0 +1,7 @@
+Title: mp3Player
+Author: Ethan Ludden
+
+Summary:
+mp3Player is a music player in python. The program has the user add songs into the playlist, provided in a music directory. Once the user adds the songs into the playlist, the user has a play/pause and a stop button to control one track. The user also has a previous and next button to switch tracks. Keyboard shortcuts are also included. Some songs are provided with the MP3 player, however the user can also upload a collection of songs from other directories while the MP3 player is running.
+
+
