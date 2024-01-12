@@ -10,6 +10,7 @@ import pygame
 #These imports come from libraries
 from tkinter import *
 from tkinter import filedialog
+from tkinter import messagebox
 
 #These global booleans run when the track is running
 paused = True
@@ -76,6 +77,7 @@ def canvas(songs):
 		entryDimenstions = str(int(screenWidth/2))  + "x" + str(int(screenHeight/4)) + "+0+0"
 		rootEntry.title("Select Song")
 		rootEntry.geometry(entryDimenstions)
+		rootEntry.resizable(False, False)
 		entryFrame = Frame(rootEntry, bg = "White", width = screenWidth, height = int(screenHeight/8))
 		entryFrame.pack()
 		#The bar for making user input is set
@@ -100,6 +102,12 @@ def canvas(songs):
 			if key == "Return" and SongBeingSelected:
 				 songToString()
 		
+		#This function is for closing the selection button
+		def on_closing():
+			rootEntry.destroy()
+			SongBeingSelected = False
+			return
+		
 		#An enter button is also there for submitting
 		enterButton = Button(entryFrame, text = "Enter", bg ="#0000FF", height = 1, width = 15, font = ("Helvetica", 10), command = songToString)
 		#As well as a header
@@ -114,6 +122,7 @@ def canvas(songs):
 		entryBar.grid(row = 1, column = 0, padx=5, pady=7)
 		
 		rootEntry.bind("<Key>", clickerAdding)
+		rootEntry.protocol("WM_DELETE_WINDOW", on_closing)
 		
 				
 	
@@ -208,6 +217,11 @@ def canvas(songs):
 			songToRemove = os.path.join("Music", song)
 			os.remove(songToRemove)
 		sys.exit("Finished")
+		
+	#This function does the closing.
+	def on_closing():
+		root.destroy()
+		exit()
 	
 	#This function deals with shortcuts
 	def clicker(event):
@@ -265,6 +279,9 @@ def canvas(songs):
 	replayButton.grid(row=1, column=1, padx=7, pady=10)
 	#One of the corners also gets an exit button
 	exitButton.grid(row=1, column=0, padx=7, pady=10)
+	
+	#Finally the window for closing the whole program.
+	root.protocol("WM_DELETE_WINDOW", on_closing)
 	
 	
 	 #All music players have a space bar shortcut for play and pause
