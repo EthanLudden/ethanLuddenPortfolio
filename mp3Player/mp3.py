@@ -71,8 +71,12 @@ def canvas(songs):
 		global SongBeingSelected
 		#This activation prevents shortcut interferences.
 		SongBeingSelected = True
-		#An entry bar is being used to make the user enter the text. It also has an entry frame to it
-		entryFrame = Frame(root, bg = "White", width = screenWidth, height = int(screenHeight/8))
+		#An entry bar is being used to make the user enter the text. It also has an entry frame to it. It will be displayed in a new window.
+		rootEntry = Tk()
+		entryDimenstions = str(int(screenWidth/2))  + "x" + str(int(screenHeight/4)) + "+0+0"
+		rootEntry.title("Select Song")
+		rootEntry.geometry(entryDimenstions)
+		entryFrame = Frame(rootEntry, bg = "White", width = screenWidth, height = int(screenHeight/8))
 		entryFrame.pack()
 		#The bar for making user input is set
 		entryFrame.place(x = 0, y = 0)
@@ -81,12 +85,14 @@ def canvas(songs):
 		def songToString():
 			global songSelected
 			text = entryBar.get() 
-			if text != "":
+			if text == "":
+				return
+			else:
 				songSelected = text
 			#All additional frames are deleted after the button or clicker action has occured
-			entryFrame.destroy()
+			rootEntry.destroy()
 			processSong(songSelected)
-				
+			
 		#This clicker function works for turning a song into a string.
 		def clickerAdding(event):
 			key = event.keysym
@@ -107,16 +113,22 @@ def canvas(songs):
 		enterButton.grid(row = 1, column = 1, padx=5, pady=7)
 		entryBar.grid(row = 1, column = 0, padx=5, pady=7)
 		
-		root.bind("<Key>", clickerAdding)
+		rootEntry.bind("<Key>", clickerAdding)
 		
+				
 	
 	#After recieving user input, this processor processes the song
 	def processSong(songSelected)	:		
+		global SongBeingSelected
 		for song in songs:
 			if song.startswith(songSelected):
 				album.append(song)
 				Playlist.insert("end", songSelected)
 		print(album)
+		SongBeingSelected = False
+		
+		return
+		
 	
 	#And now to organize the menu
 	organizedMenu = Menu(menuBar, tearoff = False)
@@ -202,7 +214,11 @@ def canvas(songs):
 		global SongBeingSelected
 		key = event.keysym
 		#A keyboard cannot interfere with song selection. Except for an enter key.
-		if SongBeingSelected:
+		if SongBeingSelected and key == "Return":
+			print(entryBar.get())
+			songSelected()
+		elif SongBeingSelected:
+			print('Song Selection')
 			return
 		elif (key == "space"):
 			playSong() #All music players must have a spacebar for play and pause
