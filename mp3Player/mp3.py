@@ -11,6 +11,8 @@ import pygame
 from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
+from pydub.utils import mediainfo
+
 
 #These global booleans run when the track is running
 paused = True
@@ -20,6 +22,8 @@ track = 0
 #Due to bugs, this variable is needed for song selection.
 SongBeingSelected = False
 songSelected = ""
+#The frequency can be adjusted 10 hz after a song is complete
+freq = 44100
 
 #The next section is when the next step is to draw the canvas
 def canvas(songs):
@@ -29,7 +33,7 @@ def canvas(songs):
 	screenWidth = root.winfo_screenwidth()
 	screenHeight = root.winfo_screenheight()
 	#The dimensions are placed into a string since the root geometry argument only takes strings. Strings must also be shown as ints.
-	dimenstions = str(int(screenWidth/2))  + "x" + str(int(screenHeight/2)) + "+0+0"
+	dimenstions = str(int(screenWidth/2))  + "x" + str(int(screenHeight /2 + 15)) + "+0+0"
 	root.geometry(dimenstions)
 	
 	album = []
@@ -43,7 +47,7 @@ def canvas(songs):
 	Playlist.pack()
 	Playlist.place(x=0, y=screenHeight/4)
 	#Then the mixer is made
-	pygame.mixer.init()
+	pygame.mixer.init(frequency=freq)
 	
 	#Now for the menu button
 	menuBar = Menu(root)
@@ -123,9 +127,7 @@ def canvas(songs):
 		
 		rootEntry.bind("<Key>", clickerAdding)
 		rootEntry.protocol("WM_DELETE_WINDOW", on_closing)
-		
-				
-	
+							
 	#After recieving user input, this processor processes the song
 	def processSong(songSelected)	:		
 		global SongBeingSelected
@@ -137,8 +139,7 @@ def canvas(songs):
 		SongBeingSelected = False
 		
 		return
-		
-	
+			
 	#And now to organize the menu
 	organizedMenu = Menu(menuBar, tearoff = False)
 	organizedMenu.add_command(label="Select Folder", command=readFinder)
@@ -158,7 +159,7 @@ def canvas(songs):
 				pygame.mixer.music.unpause()
 				paused = False
 			elif paused:
-				pygame.mixer.music.load(os. path. join("Music", currentSong))
+				pygame.mixer.music.load(os.path.join("Music", currentSong))
 				pygame.mixer.music.play()
 				paused = False
 				running = True
@@ -210,6 +211,7 @@ def canvas(songs):
 		global running
 		running = False
 		playSong() #The play function call also is used as a helper for replaying
+
 	
 	#This function closes the program
 	def exit():
@@ -246,6 +248,10 @@ def canvas(songs):
 			previousSong()
 		elif (key == "q" or key == "Q"):
 			exit()
+		elif (key == "a" or key == "A"):
+			addSong()
+		elif (key == "semicolon" or key == "colon"):
+			readFinder()
 		else:
 			print(key)
 	
